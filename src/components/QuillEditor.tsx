@@ -7,9 +7,9 @@ import { useRef, useState } from "react";
 import { downloadObjectAsJson, downloadObjectAsText } from "../utils/utils";
 import { toolbarOptions } from "../utils/toolbarOptions";
 import React from "react";
-import "./quillEditor.css";
 import * as ReactDOMServer from "react-dom/server";
 
+//FC
 export const QuillEditor: React.FC = () => {
   const [value, setValue] = useState(
     JSON.parse(localStorage.getItem("document") || "[]")
