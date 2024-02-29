@@ -1,3 +1,10 @@
+import { saveAs } from "file-saver";
+
+export const downloadObjectAsText = (text: string, filename: string): void => {
+  const blob = new Blob([text], { type: "text/html;charset=utf-8" });
+  saveAs(blob, filename);
+};
+
 export const downloadObjectAsJson = <T>(
   exportObj: T,
   exportName: string

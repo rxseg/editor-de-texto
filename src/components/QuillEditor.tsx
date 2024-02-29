@@ -4,20 +4,13 @@ import { saveAs } from "file-saver";
 import { RawOrParsedDelta, pdfExporter } from "quill-to-pdf";
 import Quill from "quill";
 import { useRef, useState } from "react";
-import { downloadObjectAsJson } from "../utils/download";
+import { downloadObjectAsJson, downloadObjectAsText } from "../utils/utils";
+import { toolbarOptions } from "../utils/toolbarOptions";
+import React from "react";
+import "./quillEditor.css";
+import * as ReactDOMServer from "react-dom/server";
 
 export const QuillEditor: React.FC = () => {
-  const toolbarOptions = [
-    [{ font: [] }],
-    [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-    ["bold", "italic", "underline", "strike"], // toggled buttons
-    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-    [{ list: "ordered" }, { list: "bullet" }, { align: [] }],
-    ["link", "image"],
-    ["clean"], // remove formatting button
-  ];
-
   const [value, setValue] = useState(
     JSON.parse(localStorage.getItem("document") || "[]")
   );
@@ -50,6 +43,32 @@ export const QuillEditor: React.FC = () => {
     saveAs(pdfAsBlob, "pdf-export.pdf"); // downloads from the browser
   };
 
+  const exportHTML = () => {
+    const htmlContent = editorRef.current?.root.innerHTML;
+
+    if (!htmlContent) {
+      return alert("Contenido no encontrado");
+    }
+
+    const contenidoDiv = (
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+      </div>
+    );
+
+    // Convierte el componente a una cadena HTML
+    const htmlString = ReactDOMServer.renderToString(contenidoDiv);
+
+    // Descarga la cadena HTML como un archivo
+    downloadObjectAsText(htmlString, "editor-html.html");
+  };
+
   const clearDocument = () => {
     editorRef.current?.deleteText(0, Infinity);
   };
@@ -60,6 +79,9 @@ export const QuillEditor: React.FC = () => {
         <div className="action-container">
           <button className="button" onClick={exportAsPDF}>
             Exportar como PDF
+          </button>
+          <button className="button" onClick={exportHTML}>
+            Exportar como HTML
           </button>
           <button className="button" onClick={exportDocument}>
             Exportar como archivo
